@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -40,15 +41,24 @@ func main() {
 			switch message.Type {
 			case "text":
 				{
-					fmt.Printf("Sender: %s\nType: %s\nMessage: %s\n", message.Sender, message.Type, message.Payload)
+					textPayload := &models.TextMessage{}
+					jsonPayload, _ := json.Marshal(message.Payload)
+					json.Unmarshal(jsonPayload, textPayload)
+					fmt.Printf("\033[38;2;255;0;0mSender: %s\nType: %s\nMessage: %+v\n\033[0m", message.Sender, message.Type, *textPayload)
 				}
 			case "binary":
 				{
-					fmt.Printf("Sender: %s\nType: %s\nMessage: %s\n", message.Sender, message.Type, message.Payload)
+					binaryPayload := &models.BinaryMessage{}
+					jsonPayload, _ := json.Marshal(message.Payload)
+					json.Unmarshal(jsonPayload, binaryPayload)
+					fmt.Printf("\033[38;2;0;255;0mSender: %s\nType: %s\nMessage: %+v\n\033[0m", message.Sender, message.Type, *binaryPayload)
 				}
 			case "bytearray":
 				{
-					fmt.Printf("Sender: %s\nType: %s\nMessage: %s\n", message.Sender, message.Type, message.Payload)
+					bytePayload := &models.ByteArray{}
+					jsonPayload, _ := json.Marshal(message.Payload)
+					json.Unmarshal(jsonPayload, bytePayload)
+					fmt.Printf("\033[38;2;0;0;255mSender: %s\nType: %s\nMessage: %+v\n\033[0m", message.Sender, message.Type, *bytePayload)
 				}
 			}
 		}
@@ -58,10 +68,35 @@ func main() {
 		text := scanner.Text()
 		message := models.Message{
 			Sender: username,
-			Type:   "text",
-			Payload: models.TextMessage{
-				Data: text,
-			},
+		}
+
+		if len(text) <= 0 {
+			fmt.Println("next")
+			continue
+		}
+
+		switch text[0] {
+		case '0':
+			{
+				message.Type = "text"
+				message.Payload = models.TextMessage{
+					Data: text[1:],
+				}
+			}
+		case '1':
+			{
+				message.Type = "binary"
+				message.Payload = models.BinaryMessage{
+					Data: text[1:],
+				}
+			}
+		case '2':
+			{
+				message.Type = "bytearray"
+				message.Payload = models.ByteArray{
+					Data: []byte(text[1:]),
+				}
+			}
 		}
 
 		err := conn.WriteJSON(message)
