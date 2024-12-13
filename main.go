@@ -44,7 +44,7 @@ func main() {
 					textPayload := &models.TextMessage{}
 					jsonPayload, _ := json.Marshal(message.Payload)
 					json.Unmarshal(jsonPayload, textPayload)
-					fmt.Printf("\033[38;2;255;0;0mSender: %s\nType: %s\nMessage: %+v\n\033[0m", message.Sender, message.Type, *textPayload)
+					fmt.Printf("\033[38;2;255;0;0mSender: %s\nType: %s\nMessage: %+v\n\033[0m", message.Sender, message.Type, textPayload.Data)
 				}
 			case "binary":
 				{
@@ -80,22 +80,29 @@ func main() {
 			{
 				message.Type = "text"
 				message.Payload = models.TextMessage{
-					Data: text[1:],
+					Data: text[2:],
 				}
 			}
 		case '1':
 			{
 				message.Type = "binary"
 				message.Payload = models.BinaryMessage{
-					Data: text[1:],
+					Data: text[2:],
 				}
 			}
 		case '2':
 			{
 				message.Type = "bytearray"
 				message.Payload = models.ByteArray{
-					Data: []byte(text[1:]),
+					Data: []byte(text[2:]),
 				}
+			}
+		}
+
+		switch text[1] {
+		case 'g':
+			{
+				message.Channel = "general"
 			}
 		}
 
