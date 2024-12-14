@@ -104,6 +104,18 @@ func main() {
 			{
 				message.Channel = "general"
 			}
+		case 'h':
+			{
+				message.Channel = "hindi"
+			}
+		case 'e':
+			{
+				message.Channel = "english"
+			}
+		case 'b':
+			{
+				message.Channel = "bakchodi"
+			}
 		}
 
 		err := conn.WriteJSON(message)
